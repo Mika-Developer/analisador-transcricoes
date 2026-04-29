@@ -173,16 +173,15 @@ async function loadSheet(){
   setStatus('Carregando planilha...','');
   setProgress(10);
   try{
-    const apiUrl=`https://sheets.googleapis.com/v4/spreadsheets/${id}/values/A1:Z10000?key=AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY`;
-    const res=await fetch(apiUrl);
+    const jsonUrl=`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json`;
+    const res=await fetch(jsonUrl);
     if(!res.ok) throw new Error('Não foi possível acessar. Verifique se a planilha está pública.');
-    const json=await res.json();
-    if(json.error) throw new Error('Erro ao acessar planilha: '+json.error.message);
-    const values=json.values;
-    if(!values||values.length<2) throw new Error('Planilha sem dados suficientes.');
-    headers=values[0];
+    const text=await res.text();
+    const json=JSON.parse(text.substring(text.indexOf('{'),text.lastIndexOf('}')+1));
+    const cols=json.table.cols.map(c=>c.label||c.id);
+    headers=cols;
     const maxCols=headers.length;
-    rows=values.slice(1).filter(r=>r.some(c=>c&&c.trim())).map(r=>{while(r.length<maxCols)r.push('');return r;});
+    rows=json.table.rows.map(r=>r.c.map(c=>c&&c.v!=null?String(c.v):'')).filter(r=>r.some(c=>c.trim()));
     preencherSelects();
     atualizarMeta();
     document.getElementById('configCard').style.display='block';

@@ -66,6 +66,18 @@
 </style>
 </head>
 <body>
+
+<div id="loginScreen" style="position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:36px 40px;width:100%;max-width:360px;text-align:center;">
+    <div style="font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px;">Sales Intelligence</div>
+    <h2 style="font-size:20px;font-weight:500;margin-bottom:6px;letter-spacing:-0.02em;">Analisador de Closers</h2>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:24px;">Digite a senha para continuar</p>
+    <input type="password" id="senhaInput" placeholder="Senha" style="margin-bottom:10px;text-align:center;" onkeydown="if(event.key==='Enter')verificarSenha()" />
+    <div id="senhaErro" style="font-size:12px;color:var(--red);font-family:var(--mono);min-height:18px;margin-bottom:10px;"></div>
+    <button onclick="verificarSenha()" style="font-family:var(--sans);font-size:14px;font-weight:500;border-radius:8px;cursor:pointer;border:none;background:var(--accent);color:#fff;padding:11px 24px;width:100%;">Entrar</button>
+  </div>
+</div>
+
 <div class="layout">
   <div class="header">
     <div class="header-tag">Sales Intelligence</div>
@@ -133,6 +145,18 @@ Formato de saída: Relatório objetivo, com títulos para cada seção. Use bull
 
 <script>
 let rows=[], headers=[];
+
+function verificarSenha(){
+  const val=document.getElementById('senhaInput').value;
+  if(val==='surisales2026'){
+    document.getElementById('loginScreen').style.display='none';
+  } else {
+    document.getElementById('senhaErro').textContent='Senha incorreta.';
+    document.getElementById('senhaInput').value='';
+    document.getElementById('senhaInput').focus();
+  }
+}
+
 
 function extractId(url){
   const m=url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);

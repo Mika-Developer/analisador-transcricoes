@@ -7,19 +7,11 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --bg: #0e0f11;
-    --surface: #16181c;
-    --surface2: #1e2127;
-    --border: rgba(255,255,255,0.07);
-    --border-hover: rgba(255,255,255,0.14);
-    --text: #e8eaed;
-    --muted: #7a7f8a;
-    --accent: #4f8ef7;
-    --green: #3ecf8e;
-    --red: #f06565;
-    --radius: 10px;
-    --mono: 'DM Mono', monospace;
-    --sans: 'DM Sans', sans-serif;
+    --bg: #0e0f11; --surface: #16181c; --surface2: #1e2127;
+    --border: rgba(255,255,255,0.07); --border-hover: rgba(255,255,255,0.14);
+    --text: #e8eaed; --muted: #7a7f8a; --accent: #4f8ef7;
+    --green: #3ecf8e; --red: #f06565; --radius: 10px;
+    --mono: 'DM Mono', monospace; --sans: 'DM Sans', sans-serif;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; line-height: 1.6; }
@@ -31,7 +23,11 @@
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 16px; }
   .card-title { font-size: 11px; font-family: var(--mono); color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 14px; }
   label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; font-family: var(--mono); }
-  input[type="text"], input[type="number"], select, textarea { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; color: var(--text); font-family: var(--sans); font-size: 14px; padding: 10px 14px; outline: none; transition: border-color 0.15s; appearance: none; }
+  input[type="text"], input[type="number"], input[type="password"], select, textarea {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 7px; color: var(--text); font-family: var(--sans);
+    font-size: 14px; padding: 10px 14px; outline: none; transition: border-color 0.15s; appearance: none;
+  }
   input:focus, select:focus, textarea:focus { border-color: var(--accent); }
   textarea { min-height: 180px; resize: vertical; font-size: 13px; font-family: var(--mono); }
   .input-row { display: flex; gap: 8px; }
@@ -55,6 +51,9 @@
   .progress-bar { height: 100%; background: var(--accent); border-radius: 2px; width: 0%; transition: width 0.4s ease; }
   .result-section { display: none; margin-top: 24px; }
   .result-content { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; font-size: 14px; line-height: 1.8; max-height: 700px; overflow-y: auto; }
+  .result-content h2 { font-size: 20px; font-weight: 600; margin: 0 0 20px; letter-spacing: -0.02em; }
+  .result-content h3 { font-size: 15px; font-weight: 600; margin: 24px 0 10px; color: var(--accent); }
+  .result-content .item { padding: 5px 0 5px 14px; border-left: 2px solid var(--border); margin: 4px 0; }
   .result-content::-webkit-scrollbar { width: 5px; }
   .result-content::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 3px; }
   .result-actions { display: flex; gap: 8px; margin-top: 12px; }
@@ -70,11 +69,11 @@
 <div id="loginScreen" style="position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999;">
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:36px 40px;width:100%;max-width:360px;text-align:center;">
     <div style="font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px;">Sales Intelligence</div>
-    <h2 style="font-size:20px;font-weight:500;margin-bottom:6px;letter-spacing:-0.02em;">Analisador de Closers</h2>
+    <h2 style="font-size:20px;font-weight:500;margin-bottom:6px;">Analisador de Closers</h2>
     <p style="font-size:13px;color:var(--muted);margin-bottom:24px;">Digite a senha para continuar</p>
-    <input type="password" id="senhaInput" placeholder="Senha" style="margin-bottom:10px;text-align:center;" onkeydown="if(event.key==='Enter')verificarSenha()" />
+    <input type="password" id="senhaInput" placeholder="Senha" style="margin-bottom:10px;text-align:center;" />
     <div id="senhaErro" style="font-size:12px;color:var(--red);font-family:var(--mono);min-height:18px;margin-bottom:10px;"></div>
-    <button onclick="verificarSenha()" style="font-family:var(--sans);font-size:14px;font-weight:500;border-radius:8px;cursor:pointer;border:none;background:var(--accent);color:#fff;padding:11px 24px;width:100%;">Entrar</button>
+    <button id="btnEntrar" style="font-family:var(--sans);font-size:14px;font-weight:500;border-radius:8px;cursor:pointer;border:none;background:var(--accent);color:#fff;padding:11px 24px;width:100%;">Entrar</button>
   </div>
 </div>
 
@@ -90,7 +89,7 @@
     <label>Link da planilha Google Sheets</label>
     <div class="input-row" style="margin-bottom:8px;">
       <input type="text" id="sheetUrl" placeholder="https://docs.google.com/spreadsheets/d/..." />
-      <button class="btn-ghost btn-sm" onclick="loadSheet()">Carregar</button>
+      <button class="btn-ghost btn-sm" id="btnCarregar">Carregar</button>
     </div>
     <p style="font-size:11px;color:var(--muted);font-family:var(--mono);">A planilha deve estar compartilhada como "qualquer pessoa com o link pode visualizar"</p>
     <div class="error-box" id="sheetError"></div>
@@ -128,7 +127,7 @@ Analise todas as transcrições e produza um diagnóstico estruturado com as seg
 Formato de saída: Relatório objetivo, com títulos para cada seção. Use bullet points apenas dentro das seções. Evite generalidades — cada afirmação deve ser ancorada nas transcrições.</textarea>
   </div>
 
-  <button class="btn-primary" id="btnRun" onclick="rodarAnalise()">Gerar relatório</button>
+  <button class="btn-primary" id="btnRun">Gerar relatório</button>
 
   <div class="status" id="statusMsg"></div>
   <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
@@ -137,210 +136,224 @@ Formato de saída: Relatório objetivo, com títulos para cada seção. Use bull
     <div id="resultChips" class="meta-row"></div>
     <div class="result-content" id="resultContent"></div>
     <div class="result-actions">
-      <button class="btn-ghost btn-sm" onclick="copiar()">Copiar relatório</button>
-      <button class="btn-ghost btn-sm" onclick="baixarTxt()">Baixar .txt</button>
+      <button class="btn-ghost btn-sm" id="btnCopiar">Copiar relatório</button>
+      <button class="btn-ghost btn-sm" id="btnBaixar">Baixar .txt</button>
     </div>
   </div>
 </div>
 
 <script>
-let rows=[], headers=[];
+var rows = [], headers = [], textoResultado = '';
+
+document.getElementById('btnEntrar').addEventListener('click', verificarSenha);
+document.getElementById('senhaInput').addEventListener('keydown', function(e){ if(e.key==='Enter') verificarSenha(); });
+document.getElementById('btnCarregar').addEventListener('click', loadSheet);
+document.getElementById('btnRun').addEventListener('click', rodarAnalise);
+document.getElementById('btnCopiar').addEventListener('click', copiar);
+document.getElementById('btnBaixar').addEventListener('click', baixarTxt);
 
 function verificarSenha(){
-  const val=document.getElementById('senhaInput').value;
-  if(val==='surisales2026'){
-    document.getElementById('loginScreen').style.display='none';
+  var val = document.getElementById('senhaInput').value;
+  if(val === 'surisales2026'){
+    document.getElementById('loginScreen').style.display = 'none';
   } else {
-    document.getElementById('senhaErro').textContent='Senha incorreta.';
-    document.getElementById('senhaInput').value='';
+    document.getElementById('senhaErro').textContent = 'Senha incorreta.';
+    document.getElementById('senhaInput').value = '';
     document.getElementById('senhaInput').focus();
   }
 }
 
-
 function extractId(url){
-  const m=url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
-  return m?m[1]:null;
+  var m = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+  return m ? m[1] : null;
 }
+
+function setStatus(msg, type){
+  var el = document.getElementById('statusMsg');
+  el.className = 'status' + (type ? ' ' + type : '');
+  if(msg && !type){ el.innerHTML = '<span class="dot"></span>' + msg; }
+  else { el.textContent = msg; }
+}
+
+function setProgress(pct){ document.getElementById('progressBar').style.width = pct + '%'; }
+function showErr(msg){ var e = document.getElementById('sheetError'); e.textContent = msg; e.style.display = 'block'; }
+
+function getMes(v){
+  if(!v) return null;
+  v = String(v);
+  var gviz = v.match(/Date\((\d+),(\d+),/);
+  if(gviz) return parseInt(gviz[2]) + 1;
+  var br = v.match(/^\d{1,2}\/(\d{1,2})\//);
+  if(br) return parseInt(br[1]);
+  var iso = v.match(/-(\d{2})-/);
+  if(iso) return parseInt(iso[1]);
+  return null;
+}
+function isMarco(v){ return getMes(v) === 3; }
+function isAbril(v){ return getMes(v) === 4; }
 
 async function loadSheet(){
-  const url=document.getElementById('sheetUrl').value.trim();
-  const errBox=document.getElementById('sheetError');
-  errBox.style.display='none';
-  if(!url){showErr('Cole o link da planilha.');return;}
-  const id=extractId(url);
-  if(!id){showErr('Link inválido. Use o link completo do Google Sheets.');return;}
-  setStatus('Carregando planilha...','');
+  var url = document.getElementById('sheetUrl').value.trim();
+  var errBox = document.getElementById('sheetError');
+  errBox.style.display = 'none';
+  if(!url){ showErr('Cole o link da planilha.'); return; }
+  var id = extractId(url);
+  if(!id){ showErr('Link inválido.'); return; }
+  setStatus('Carregando planilha...', '');
   setProgress(10);
-  try{
-    const jsonUrl=`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json`;
-    const res=await fetch(jsonUrl);
+  try {
+    var jsonUrl = 'https://docs.google.com/spreadsheets/d/' + id + '/gviz/tq?tqx=out:json';
+    var res = await fetch(jsonUrl);
     if(!res.ok) throw new Error('Não foi possível acessar. Verifique se a planilha está pública.');
-    const text=await res.text();
-    const json=JSON.parse(text.substring(text.indexOf('{'),text.lastIndexOf('}')+1));
-    const cols=json.table.cols.map(c=>c.label||c.id);
-    headers=cols;
-    const maxCols=headers.length;
-    rows=json.table.rows.map(r=>r.c.map(c=>c&&c.v!=null?String(c.v):'')).filter(r=>r.some(c=>c.trim()));
+    var text = await res.text();
+    var json = JSON.parse(text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1));
+    var cols = json.table.cols.map(function(c){ return c.label || c.id; });
+    headers = cols;
+    var maxCols = headers.length;
+    rows = json.table.rows.map(function(r){
+      return r.c.map(function(c){ return c && c.v != null ? String(c.v) : ''; });
+    }).filter(function(r){ return r.some(function(c){ return c.trim(); }); });
     preencherSelects();
     atualizarMeta();
-    document.getElementById('configCard').style.display='block';
+    document.getElementById('configCard').style.display = 'block';
     setProgress(100);
-    setStatus(`${rows.length} linhas carregadas.`,'ok');
-  }catch(e){
-    setProgress(0);setStatus('','');showErr(e.message);
+    setStatus(rows.length + ' linhas carregadas.', 'ok');
+  } catch(e) {
+    setProgress(0); setStatus('', ''); showErr(e.message);
   }
-}
-
-function parseCSV(text){
-  const rows=[];let row=[],field='',inQ=false;
-  for(let i=0;i<text.length;i++){
-    const c=text[i],n=text[i+1];
-    if(inQ){if(c==='"'&&n==='"'){field+='"';i++;}else if(c==='"')inQ=false;else field+=c;}
-    else{if(c==='"')inQ=true;else if(c===','){row.push(field);field='';}
-    else if(c==='\n'||(c==='\r'&&n==='\n')){row.push(field);field='';if(row.some(x=>x))rows.push(row);row=[];if(c==='\r')i++;}
-    else field+=c;}
-  }
-  if(field||row.length){row.push(field);if(row.some(x=>x))rows.push(row);}
-  return rows;
 }
 
 function preencherSelects(){
-  ['colT','colC','colD'].forEach(id=>{
-    const sel=document.getElementById(id);
-    sel.innerHTML=headers.map((h,i)=>`<option value="${i}">${h||'Col '+(i+1)}</option>`).join('');
+  ['colT','colC','colD'].forEach(function(id){
+    var sel = document.getElementById(id);
+    sel.innerHTML = headers.map(function(h, i){ return '<option value="' + i + '">' + (h || 'Col ' + (i+1)) + '</option>'; }).join('');
   });
-  const guess=kws=>headers.findIndex(h=>kws.some(k=>h.toLowerCase().includes(k)));
-  const t=guess(['transcri','texto','fala','conversa']);
-  const c=guess(['closer','vendedor','nome','operador','agente']);
-  const d=guess(['data','hora','carimbo','timestamp','date']);
-  if(t>=0)document.getElementById('colT').value=t;
-  if(c>=0)document.getElementById('colC').value=c;
-  if(d>=0)document.getElementById('colD').value=d;
+  function guess(kws){ return headers.findIndex(function(h){ return kws.some(function(k){ return h.toLowerCase().indexOf(k) >= 0; }); }); }
+  var t = guess(['transcri','texto','fala','conversa']);
+  var c = guess(['closer','vendedor','nome','operador','agente']);
+  var d = guess(['data','hora','carimbo','timestamp','date']);
+  if(t >= 0) document.getElementById('colT').value = t;
+  if(c >= 0) document.getElementById('colC').value = c;
+  if(d >= 0) document.getElementById('colD').value = d;
 }
 
 function atualizarMeta(){
-  const iD=+document.getElementById('colD').value;
-  const iC=+document.getElementById('colC').value;
-  const março=rows.filter(r=>isMarco(r[iD])).length;
-  const abril=rows.filter(r=>isAbril(r[iD])).length;
-  const closers=new Set(rows.map(r=>r[iC]).filter(Boolean)).size;
-  document.getElementById('metaChips').innerHTML=`
-    <div class="meta-chip"><div class="num">${rows.length}</div><div class="lbl">Total</div></div>
-    <div class="meta-chip"><div class="num">${março}</div><div class="lbl">Março</div></div>
-    <div class="meta-chip"><div class="num">${abril}</div><div class="lbl">Abril</div></div>
-    <div class="meta-chip"><div class="num">${closers}</div><div class="lbl">Closers</div></div>`;
+  var iD = +document.getElementById('colD').value;
+  var iC = +document.getElementById('colC').value;
+  var marco = rows.filter(function(r){ return isMarco(r[iD]); }).length;
+  var abril = rows.filter(function(r){ return isAbril(r[iD]); }).length;
+  var closers = new Set(rows.map(function(r){ return r[iC]; }).filter(Boolean)).size;
+  document.getElementById('metaChips').innerHTML =
+    '<div class="meta-chip"><div class="num">' + rows.length + '</div><div class="lbl">Total</div></div>' +
+    '<div class="meta-chip"><div class="num">' + marco + '</div><div class="lbl">Março</div></div>' +
+    '<div class="meta-chip"><div class="num">' + abril + '</div><div class="lbl">Abril</div></div>' +
+    '<div class="meta-chip"><div class="num">' + closers + '</div><div class="lbl">Closers</div></div>';
 }
-
-function getMes(v){
-  if(!v)return null;
-  v=String(v);
-  var gviz=v.match(/Date\(\d+,(\d+),/);
-  if(gviz)return parseInt(gviz[1])+1;
-  var br=v.match(/^\d{1,2}\/(\d{1,2})\//);
-  if(br)return parseInt(br[1]);
-  var iso=v.match(/-(\d{2})-/);
-  if(iso)return parseInt(iso[1]);
-  return null;
-}
-function isMarco(v){return getMes(v)===3;}
-function isAbril(v){return getMes(v)===4;}
-
-function setStatus(msg,type){
-  const el=document.getElementById('statusMsg');
-  el.className='status'+(type?' '+type:'');
-  if(msg&&type===''){el.innerHTML=`<span class="dot"></span>${msg}`;}else{el.textContent=msg;}
-}
-
-function setProgress(pct){document.getElementById('progressBar').style.width=pct+'%';}
-function showErr(msg){const e=document.getElementById('sheetError');e.textContent=msg;e.style.display='block';}
 
 function selecionarAmostra(){
-  const iT=+document.getElementById('colT').value;
-  const iC=+document.getElementById('colC').value;
-  const iD=+document.getElementById('colD').value;
-  const max=+document.getElementById('maxN').value||15;
-  const contagem={},resultado=[];
-  for(const row of rows){
-    const texto=(row[iT]||'').trim();
-    const closer=(row[iC]||'Desconhecido').trim();
-    const data=(row[iD]||'').trim();
-    if(!texto||texto.length<50)continue;
-    let mes=null;
-    if(isMarco(data))mes='Março';
-    else if(isAbril(data))mes='Abril';
-    if(!mes)continue;
-    const chave=`${closer}|${mes}`;
-    contagem[chave]=(contagem[chave]||0);
-    if(contagem[chave]<max){contagem[chave]++;resultado.push({closer,mes,texto});}
-  }
+  var iT = +document.getElementById('colT').value;
+  var iC = +document.getElementById('colC').value;
+  var iD = +document.getElementById('colD').value;
+  var max = +document.getElementById('maxN').value || 15;
+  var contagem = {}, resultado = [];
+  rows.forEach(function(row){
+    var texto = (row[iT] || '').trim();
+    var closer = (row[iC] || 'Desconhecido').trim();
+    var data = (row[iD] || '').trim();
+    if(!texto || texto.length < 50) return;
+    var mes = null;
+    if(isMarco(data)) mes = 'Março';
+    else if(isAbril(data)) mes = 'Abril';
+    if(!mes) return;
+    var chave = closer + '|' + mes;
+    contagem[chave] = contagem[chave] || 0;
+    if(contagem[chave] < max){ contagem[chave]++; resultado.push({closer: closer, mes: mes, texto: texto}); }
+  });
   return resultado;
 }
 
+function formatarRelatorio(texto){
+  var div = document.createElement('div');
+  var linhas = texto.split('\n');
+  var html = '';
+  linhas.forEach(function(linha){
+    if(linha.startsWith('# ')){
+      html += '<h2 style="font-size:20px;font-weight:600;margin:0 0 20px;letter-spacing:-0.02em;">' + linha.substring(2) + '</h2>';
+    } else if(linha.startsWith('## ')){
+      html += '<h3 style="font-size:15px;font-weight:600;margin:24px 0 10px;color:#4f8ef7;">' + linha.substring(3) + '</h3>';
+    } else if(linha.startsWith('### ')){
+      html += '<h4 style="font-size:13px;font-weight:600;margin:16px 0 6px;">' + linha.substring(4) + '</h4>';
+    } else if(linha.startsWith('- ') || linha.startsWith('* ')){
+      var conteudo = linha.substring(2).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      html += '<div class="item">' + conteudo + '</div>';
+    } else if(linha.trim() === ''){
+      html += '<br>';
+    } else {
+      var conteudo = linha.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      html += '<p style="margin:6px 0;">' + conteudo + '</p>';
+    }
+  });
+  return html;
+}
+
 async function rodarAnalise(){
-  const prompt=document.getElementById('promptTxt').value.trim();
-  if(!prompt){alert('Preencha o prompt de análise.');return;}
-  const amostra=selecionarAmostra();
-  if(amostra.length===0){alert('Nenhuma transcrição de março ou abril encontrada. Carregue a planilha e verifique as colunas selecionadas.');return;}
-  const btn=document.getElementById('btnRun');
-  btn.disabled=true;btn.textContent='Analisando...';
-  document.getElementById('resultSection').style.display='none';
-  setProgress(5);setStatus('Preparando '+amostra.length+' transcrições...','');
-  const bloco=amostra.map((r,i)=>`--- Transcrição ${i+1} | Closer: ${r.closer} | Mês: ${r.mes} ---\n${r.texto}`).join('\n\n');
-  const payload=`${prompt}\n\nTRANSCRIÇÕES:\n\n${bloco}`;
-  try{
-    setProgress(20);setStatus('Enviando para Claude Sonnet...','');
-    const resp=await fetch('https://suri-ai-proxy.mikaely-lopespaiva.workers.dev/',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'gpt-4o',max_tokens:4000,messages:[{role:'user',content:payload}]})
+  var prompt = document.getElementById('promptTxt').value.trim();
+  if(!prompt){ alert('Preencha o prompt de análise.'); return; }
+  var amostra = selecionarAmostra();
+  if(amostra.length === 0){ alert('Nenhuma transcrição de março ou abril encontrada.'); return; }
+  var btn = document.getElementById('btnRun');
+  btn.disabled = true; btn.textContent = 'Analisando...';
+  document.getElementById('resultSection').style.display = 'none';
+  setProgress(5);
+  setStatus('Preparando ' + amostra.length + ' transcrições...', '');
+  var bloco = amostra.map(function(r, i){
+    return '--- Transcrição ' + (i+1) + ' | Closer: ' + r.closer + ' | Mês: ' + r.mes + ' ---\n' + r.texto;
+  }).join('\n\n');
+  var payload = prompt + '\n\nTRANSCRIÇÕES:\n\n' + bloco;
+  try {
+    setProgress(20); setStatus('Enviando para GPT-4o...', '');
+    var resp = await fetch('https://suri-ai-proxy.mikaely-lopespaiva.workers.dev/', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({model: 'gpt-4o', max_tokens: 4000, messages: [{role: 'user', content: payload}]})
     });
     setProgress(80);
-    const data=await resp.json();
-    if(data.error)throw new Error(data.error.message);
-    const texto=data.choices[0].message.content;
-    setProgress(100);setStatus('Relatório gerado com sucesso.','ok');
-    const março=amostra.filter(r=>r.mes==='Março').length;
-    const abril=amostra.filter(r=>r.mes==='Abril').length;
-    const closers=new Set(amostra.map(r=>r.closer)).size;
-    document.getElementById('resultChips').innerHTML=`
-      <div class="meta-chip"><div class="num">${amostra.length}</div><div class="lbl">Analisadas</div></div>
-      <div class="meta-chip"><div class="num">${março}</div><div class="lbl">Março</div></div>
-      <div class="meta-chip"><div class="num">${abril}</div><div class="lbl">Abril</div></div>
-      <div class="meta-chip"><div class="num">${closers}</div><div class="lbl">Closers</div></div>`;
-    document.getElementById('resultContent').innerHTML=formatarRelatorio(texto);
-    document.getElementById('resultSection').style.display='block';
-    document.getElementById('resultSection').scrollIntoView({behavior:'smooth'});
-  }catch(e){
-    setStatus('Erro: '+e.message,'err');setProgress(0);
-  }finally{
-    btn.disabled=false;btn.textContent='Gerar relatório';
+    var data = await resp.json();
+    if(data.error) throw new Error(data.error.message);
+    textoResultado = data.choices[0].message.content;
+    setProgress(100); setStatus('Relatório gerado com sucesso.', 'ok');
+    var marco = amostra.filter(function(r){ return r.mes === 'Março'; }).length;
+    var abril = amostra.filter(function(r){ return r.mes === 'Abril'; }).length;
+    var closers = new Set(amostra.map(function(r){ return r.closer; })).size;
+    document.getElementById('resultChips').innerHTML =
+      '<div class="meta-chip"><div class="num">' + amostra.length + '</div><div class="lbl">Analisadas</div></div>' +
+      '<div class="meta-chip"><div class="num">' + marco + '</div><div class="lbl">Março</div></div>' +
+      '<div class="meta-chip"><div class="num">' + abril + '</div><div class="lbl">Abril</div></div>' +
+      '<div class="meta-chip"><div class="num">' + closers + '</div><div class="lbl">Closers</div></div>';
+    document.getElementById('resultContent').innerHTML = formatarRelatorio(textoResultado);
+    document.getElementById('resultSection').style.display = 'block';
+    document.getElementById('resultSection').scrollIntoView({behavior: 'smooth'});
+  } catch(e) {
+    setStatus('Erro: ' + e.message, 'err'); setProgress(0);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Gerar relatório';
   }
 }
 
-function formatarRelatorio(texto){
-  var t = texto;
-  t = t.replace(/^# (.+)$/gm, '<h2 style="font-size:20px;font-weight:600;margin:0 0 20px;">$1</h2>');
-  t = t.replace(/^## (.+)$/gm, '<h3 style="font-size:15px;font-weight:600;margin:20px 0 8px;color:#4f8ef7;">$1</h3>');
-  t = t.replace(/^### (.+)$/gm, '<h4 style="font-size:13px;font-weight:600;margin:14px 0 6px;">$1</h4>');
-  t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  t = t.replace(/^- (.+)$/gm, '<div style="padding:5px 0 5px 14px;border-left:2px solid rgba(255,255,255,0.1);margin:3px 0;">$1</div>');
-  t = t.replace(/
-
-/g, '<br><br>');
-  t = t.replace(/
-/g, '<br>');
-  return t;
-}
 function copiar(){
-  navigator.clipboard.writeText(document.getElementById('resultContent').textContent).then(()=>{
-    const btn=event.target;btn.textContent='Copiado!';setTimeout(()=>btn.textContent='Copiar relatório',2000);
+  navigator.clipboard.writeText(textoResultado).then(function(){
+    var btn = document.getElementById('btnCopiar');
+    btn.textContent = 'Copiado!';
+    setTimeout(function(){ btn.textContent = 'Copiar relatório'; }, 2000);
   });
 }
 
 function baixarTxt(){
-  const blob=new Blob([document.getElementById('resultContent').textContent],{type:'text/plain'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='relatorio_closers.txt';a.click();
+  var blob = new Blob([textoResultado], {type: 'text/plain'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'relatorio_closers.txt';
+  a.click();
 }
 </script>
 </body>

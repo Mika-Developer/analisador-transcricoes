@@ -173,14 +173,16 @@ async function loadSheet(){
   setStatus('Carregando planilha...','');
   setProgress(10);
   try{
-    const csvUrl=`https://docs.google.com/spreadsheets/d/${id}/export?format=csv&gid=0`;
-    const res=await fetch(`https://corsproxy.io/?${encodeURIComponent(csvUrl)}`);
+    const apiUrl=`https://sheets.googleapis.com/v4/spreadsheets/${id}/values/A1:Z10000?key=AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY`;
+    const res=await fetch(apiUrl);
     if(!res.ok) throw new Error('Não foi possível acessar. Verifique se a planilha está pública.');
-    const text=await res.text();
-    const parsed=parseCSV(text);
-    if(parsed.length<2) throw new Error('Planilha sem dados suficientes.');
-    headers=parsed[0];
-    rows=parsed.slice(1).filter(r=>r.some(c=>c.trim()));
+    const json=await res.json();
+    if(json.error) throw new Error('Erro ao acessar planilha: '+json.error.message);
+    const values=json.values;
+    if(!values||values.length<2) throw new Error('Planilha sem dados suficientes.');
+    headers=values[0];
+    const maxCols=headers.length;
+    rows=values.slice(1).filter(r=>r.some(c=>c&&c.trim())).map(r=>{while(r.length<maxCols)r.push('');return r;});
     preencherSelects();
     atualizarMeta();
     document.getElementById('configCard').style.display='block';
@@ -319,4 +321,3 @@ function baixarTxt(){
 </script>
 </body>
 </html>
-

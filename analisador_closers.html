@@ -81,7 +81,7 @@
   <div class="header">
     <div class="header-tag">Sales Intelligence</div>
     <h1>Analisador de Closers</h1>
-    <p class="subtitle">Análise comparativa de transcrições março vs abril — powered by GPT-4o</p>
+    <p class="subtitle">Análise comparativa de transcrições março vs abril — powered by Claude Sonnet</p>
   </div>
 
   <div class="card">
@@ -311,7 +311,7 @@ async function rodarAnalise(){
   }).join('\n\n');
   var payload = prompt + '\n\nTRANSCRIÇÕES:\n\n' + bloco;
   try {
-    setProgress(20); setStatus('Enviando para GPT-4o...', '');
+    setProgress(20); setStatus('Enviando para Claude Sonnet...', '');
     var resp = await fetch('https://suri-ai-proxy.mikaely-lopespaiva.workers.dev/', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},

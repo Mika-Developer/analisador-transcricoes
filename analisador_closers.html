@@ -183,7 +183,7 @@ async function loadSheet(){
     const maxCols=headers.length;
     rows=json.table.rows.map(r=>r.c.map(c=>c&&c.v!=null?String(c.v):'')).filter(r=>r.some(c=>c.trim()));
     preencherSelects();
-    atualizarMeta();debugData();
+    atualizarMeta();
     document.getElementById('configCard').style.display='block';
     setProgress(100);
     setStatus(`${rows.length} linhas carregadas.`,'ok');
@@ -219,11 +219,6 @@ function preencherSelects(){
   if(d>=0)document.getElementById('colD').value=d;
 }
 
-function debugData(){
-  const iD=+document.getElementById('colD').value;
-  const sample=rows.slice(0,3).map(r=>r[iD]);
-  console.log('DATAS SAMPLE:', JSON.stringify(sample));
-}
 function atualizarMeta(){
   const iD=+document.getElementById('colD').value;
   const iC=+document.getElementById('colC').value;
@@ -237,8 +232,19 @@ function atualizarMeta(){
     <div class="meta-chip"><div class="num">${closers}</div><div class="lbl">Closers</div></div>`;
 }
 
-function isMarco(v){if(!v)return false;v=String(v).toLowerCase();return v.includes('/03/')||v.includes('-03-')||v.includes('mar')||v.startsWith('3/')||/^\d{1,2}\/3\//.test(v)||v.includes('03/20')||v.includes('/03/20');}
-function isAbril(v){if(!v)return false;v=String(v).toLowerCase();return v.includes('/04/')||v.includes('-04-')||v.includes('abr')||v.includes('apr')||v.startsWith('4/')||/^\d{1,2}\/4\//.test(v)||v.includes('04/20')||v.includes('/04/20');}
+function getMes(v){
+  if(!v)return null;
+  v=String(v);
+  var gviz=v.match(/Date\(\d+,(\d+),/);
+  if(gviz)return parseInt(gviz[1])+1;
+  var br=v.match(/^\d{1,2}\/(\d{1,2})\//);
+  if(br)return parseInt(br[1]);
+  var iso=v.match(/-(\d{2})-/);
+  if(iso)return parseInt(iso[1]);
+  return null;
+}
+function isMarco(v){return getMes(v)===3;}
+function isAbril(v){return getMes(v)===4;}
 
 function setStatus(msg,type){
   const el=document.getElementById('statusMsg');

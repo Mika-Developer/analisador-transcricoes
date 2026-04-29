@@ -290,7 +290,7 @@ async function rodarAnalise(){
   const payload=`${prompt}\n\nTRANSCRIÇÕES:\n\n${bloco}`;
   try{
     setProgress(20);setStatus('Enviando para Claude Sonnet...','');
-    const resp=await fetch('https://api.openai.com/v1/chat/completions',{
+    const resp=await fetch('https://suri-ai-proxy.mikaely-lopespaiva.workers.dev/',{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer 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'},
       body:JSON.stringify({model:'gpt-4o',max_tokens:4000,messages:[{role:'user',content:payload}]})

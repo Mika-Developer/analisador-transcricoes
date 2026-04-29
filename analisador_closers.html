@@ -54,7 +54,7 @@
   .progress-track { height: 3px; background: var(--surface2); border-radius: 2px; margin: 4px 0 12px; overflow: hidden; }
   .progress-bar { height: 100%; background: var(--accent); border-radius: 2px; width: 0%; transition: width 0.4s ease; }
   .result-section { display: none; margin-top: 24px; }
-  .result-content { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; white-space: pre-wrap; font-size: 14px; line-height: 1.8; max-height: 700px; overflow-y: auto; }
+  .result-content { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; font-size: 14px; line-height: 1.8; max-height: 700px; overflow-y: auto; }
   .result-content::-webkit-scrollbar { width: 5px; }
   .result-content::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 3px; }
   .result-actions { display: flex; gap: 8px; margin-top: 12px; }
@@ -308,7 +308,7 @@ async function rodarAnalise(){
       <div class="meta-chip"><div class="num">${março}</div><div class="lbl">Março</div></div>
       <div class="meta-chip"><div class="num">${abril}</div><div class="lbl">Abril</div></div>
       <div class="meta-chip"><div class="num">${closers}</div><div class="lbl">Closers</div></div>`;
-    document.getElementById('resultContent').textContent=texto;
+    document.getElementById('resultContent').innerHTML=formatarRelatorio(texto);
     document.getElementById('resultSection').style.display='block';
     document.getElementById('resultSection').scrollIntoView({behavior:'smooth'});
   }catch(e){
@@ -318,6 +318,20 @@ async function rodarAnalise(){
   }
 }
 
+function formatarRelatorio(texto){
+  var t = texto;
+  t = t.replace(/^# (.+)$/gm, '<h2 style="font-size:20px;font-weight:600;margin:0 0 20px;">$1</h2>');
+  t = t.replace(/^## (.+)$/gm, '<h3 style="font-size:15px;font-weight:600;margin:20px 0 8px;color:#4f8ef7;">$1</h3>');
+  t = t.replace(/^### (.+)$/gm, '<h4 style="font-size:13px;font-weight:600;margin:14px 0 6px;">$1</h4>');
+  t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  t = t.replace(/^- (.+)$/gm, '<div style="padding:5px 0 5px 14px;border-left:2px solid rgba(255,255,255,0.1);margin:3px 0;">$1</div>');
+  t = t.replace(/
+
+/g, '<br><br>');
+  t = t.replace(/
+/g, '<br>');
+  return t;
+}
 function copiar(){
   navigator.clipboard.writeText(document.getElementById('resultContent').textContent).then(()=>{
     const btn=event.target;btn.textContent='Copiado!';setTimeout(()=>btn.textContent='Copiar relatório',2000);
